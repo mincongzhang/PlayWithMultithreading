@@ -80,7 +80,8 @@ public:
         // Produce a string and store in the queue
         string str = "Producer ["+boost::lexical_cast<string>(m_id+1)+"]: produced data "+boost::lexical_cast<string>(++data)+".";
         m_queue->Enqueue(str);
-        cout<<str<<endl;
+        str+="\n";
+        cout<<str;
 
         // Sleep one second
         boost::this_thread::sleep(boost::posix_time::seconds(1));
@@ -109,7 +110,8 @@ public:
     while (true)
       {
         // Get the data from the queue and print it
-        cout<<"Consumer ["<<boost::lexical_cast<string>(m_id+1)<<"] consumed: ("<<m_queue->Dequeue()<<")"<<endl;
+        std::string str = "Consumer ["+boost::lexical_cast<string>(m_id+1)+"] consumed: ("+m_queue->Dequeue()+")\n";
+        cout<<str;
 
         // Make sure we can be interrupted
         boost::this_thread::interruption_point();
@@ -161,3 +163,4 @@ int main()
   producers.interrupt_all(); producers.join_all();
   consumers.interrupt_all(); consumers.join_all();
 }
+
