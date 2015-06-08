@@ -3,28 +3,22 @@
 #include <queue>
 #include <iostream>
 #include <string>
-//#include "Producer.hpp"
-//#include "Consumer.hpp"
 
 using namespace boost;
 using namespace boost::this_thread;
 using namespace std;
 
-
 // Queue class that has thread synchronisation
 template <typename T>
-class SynchronisedQueue
-{
+class SynchronisedQueue{
 private:
   std::queue<T> m_queue; // Use STL queue to store data
   boost::mutex m_mutex; // The mutex to synchronise on
   boost::condition_variable m_cond; // The condition to wait for
 
 public:
-
   // Add data to the queue and notify others
-  void Enqueue(const T& data)
-  {
+  void Enqueue(const T& data){
     // Acquire lock on the queue
     boost::unique_lock<boost::mutex> lock(m_mutex);
 
@@ -36,10 +30,8 @@ public:
 
   } // Lock is automatically released here
 
-  // Get data from the queue. Wait for data if not available
-  T Dequeue()
-  {
-
+    // Get data from the queue. Wait for data if not available
+  T Dequeue(){
     // Acquire lock on the queue
     boost::unique_lock<boost::mutex> lock(m_mutex);
 
@@ -51,76 +43,65 @@ public:
     // Retrieve the data from the queue
     T result=m_queue.front(); m_queue.pop();
     return result;
-
   } // Lock is automatically released here
 };
 
 // Class that produces objects and puts them in a queue
-class Producer
-{
+class Producer{
 private:
   int m_id; // The id of the producer
-  SynchronisedQueue<string>* m_queue; // The queue to use
+  SynchronisedQueue<std::string>* m_queue; // The queue to use
 
 public:
-
   // Constructor with id and the queue to use
-  Producer(int id, SynchronisedQueue<string>* queue)
-  {
+  Producer(int id, SynchronisedQueue<std::string>* queue){
     m_id=id;
     m_queue=queue;
   }
 
   // The thread function fills the queue with data
-  void operator () ()
-  {
+  void operator () (){
     int data=0;
-    while (true)
-      {
-        // Produce a string and store in the queue
-        string str = "Producer ["+boost::lexical_cast<string>(m_id+1)+"]: produced data "+boost::lexical_cast<string>(++data)+".";
-        m_queue->Enqueue(str);
-        str+="\n";
-        cout<<str;
+    while (true){
+      // Produce a string and store in the queue
+      std::string str = "Producer ["+boost::lexical_cast<std::string>(m_id+1)+"]: produced data "+boost::lexical_cast<std::string>(++data)+".";
+      m_queue->Enqueue(str);
+      str+="\n";
+      cout<<str;
 
-        // Sleep one second
-        boost::this_thread::sleep(boost::posix_time::seconds(1));
-      }
+      // Sleep one second
+      boost::this_thread::sleep(boost::posix_time::seconds(1));
+    }
   }
 };
 
 // Class that consumes objects from a queue
-class Consumer
-{
+class Consumer{
 private:
   int m_id; // The id of the consumer
-  SynchronisedQueue<string>* m_queue; // The queue to use
+  SynchronisedQueue<std::string>* m_queue; // The queue to use
 
 public:
   // Constructor with id and the queue to use.
-  Consumer(int id, SynchronisedQueue<string>* queue)
-  {
+  Consumer(int id, SynchronisedQueue<std::string>* queue){
     m_id=id;
     m_queue=queue;
   }
 
   // The thread function reads data from the queue
-  void operator () ()
-  {
-    while (true)
-      {
-        // Get the data from the queue and print it
-        std::string str = "Consumer ["+boost::lexical_cast<string>(m_id+1)+"] consumed: ("+m_queue->Dequeue()+")\n";
-        cout<<str;
+  void operator () (){
+    while (true){
+      // Get the data from the queue and print it
+      std::string str = "Consumer ["+boost::lexical_cast<std::string>(m_id+1)+"] consumed: ("+m_queue->Dequeue()+")\n";
+      cout<<str;
 
-        // Make sure we can be interrupted
-        boost::this_thread::interruption_point();
-      }
+      // Make sure we can be interrupted
+      boost::this_thread::interruption_point();
+    }
   }
 };
 
-int main()
-{
+int main(){
   // Display the number of processors/cores
   cout<<boost::thread::hardware_concurrency()
       <<" processors/cores detected."<<endl<<endl;
@@ -129,7 +110,7 @@ int main()
   int nrProducers, nrConsumers;
 
   // The shared queue
-  SynchronisedQueue<string> queue;
+  SynchronisedQueue<std::string> queue;
 
   // Ask the number of producers
   cout<<"How many producers do you want? : ";
@@ -163,4 +144,3 @@ int main()
   producers.interrupt_all(); producers.join_all();
   consumers.interrupt_all(); consumers.join_all();
 }
-
