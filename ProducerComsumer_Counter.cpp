@@ -16,7 +16,7 @@ void Consumer()
   boost::mutex::scoped_lock lock(m);
   while(!done)
     {
-      while (!ready_to_consume)
+      if(!ready_to_consume)
         {
           con_consumer.wait(lock);
         }
@@ -32,7 +32,7 @@ void Producer()
     {
       boost::this_thread::sleep(boost::posix_time::millisec(500));
       boost::mutex::scoped_lock lock(m);
-      while(ready_to_consume)
+      if(ready_to_consume)
         {
           con_producer.wait(lock);
         }
