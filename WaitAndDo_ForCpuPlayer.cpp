@@ -1,55 +1,42 @@
 #include <boost/thread.hpp>
 #include <iostream>
+#include <stdlib.h>
 
 using namespace std;
 
 boost::mutex m;
-boost::condition_variable con_producer;
-boost::condition_variable con_consumer;
-volatile bool ready_to_consume = false;
-volatile bool done = false;
+boost::condition_variable con_publisher;
 int counter(0);
 
-//WAIT for 1000 millisec
-void Consumer()
+//Publish for every 1000 ms, prevent producer producing too fast
+//However when producer produces kind of slow, wait for it to finish
+void Publisher()
 {
   boost::mutex::scoped_lock lock(m);
-  while(!done)
-    {
-      boost::this_thread::sleep(boost::posix_time::millisec(1000));
-      if (!ready_to_consume)
-        {
-          con_consumer.wait(lock);
-        }
-      cout << counter << endl;
-      ready_to_consume = false;
-      con_producer.notify_one();
-    }
+  boost::this_thread::sleep(boost::posix_time::millisec(1000));
+  con_publisher.wait(lock);
+  cout <<"Publish production: ["<<counter<<"]"<< endl;
 }
 
-//DO
 void Producer()
 {
-  while(!done)
-    {
-      boost::this_thread::sleep(boost::posix_time::millisec(500));
-      boost::mutex::scoped_lock lock(m);
-      if(ready_to_consume)
-        {
-          con_producer.wait(lock);
-        }
-      ++counter;
-      ready_to_consume = true;
-      done = (counter == 10);
-      con_consumer.notify_one();
-    }
+  for(int i=0;i<10;i++){
+    ++counter;
+    cout <<"Producing: ["<<counter<<"]"<< endl;
+    boost::this_thread::sleep(boost::posix_time::millisec(rand() % 100 + 300));
+  }
+  con_publisher.notify_one();
 }
 
 int main()
 {
-  boost::thread consumer_pthread(Consumer);
-  boost::thread producer_pthread(Producer);
-  consumer_pthread.join();
-  producer_pthread.join();
+
+  for(int i=0;i<10;i++){
+    boost::thread publisher_pthread(Publisher);
+    boost::thread producer_pthread(Producer);
+    publisher_pthread.join();
+    producer_pthread.join();
+  }
+
   return 0;
 }
