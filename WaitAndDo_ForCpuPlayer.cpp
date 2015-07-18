@@ -40,6 +40,11 @@ int main()
   for(int i=0;i<10;i++){
     boost::thread publisher_pthread(Publisher);
     boost::thread producer_pthread(Producer);
+    
+    // Function with Arguments
+    //void workerFunc(const char* msg, unsigned delaySecs) //...
+    //boost::thread workerThread(workerFunc, "Hello, boost!", 3);
+    
     publisher_pthread.join();
     producer_pthread.join();
   }
