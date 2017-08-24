@@ -3,7 +3,9 @@
 #include <boost/unordered_map.hpp>  
 #include <boost/functional/hash.hpp>  
 #include <functional>  
-  
+
+//http://blog.csdn.net/cszhouwei/article/details/42427607
+
 int main (int argc, char *argv[])  
 {  
     typedef int KeyType;  
