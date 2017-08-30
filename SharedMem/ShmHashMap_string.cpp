@@ -12,6 +12,8 @@
 //http://www.boost.org/doc/libs/1_55_0/doc/html/interprocess/quick_guide.html
 //http://www.boost.org/doc/libs/1_65_0/doc/html/interprocess/allocators_containers.html#interprocess.allocators_containers.additional_containers.unordered
 
+//http://www.boost.org/doc/libs/1_55_0/doc/html/interprocess/managed_memory_segments.html
+
 namespace {
   typedef boost::interprocess::allocator<char, boost::interprocess::managed_shared_memory::segment_manager> CharAllocator;
   typedef boost::interprocess::basic_string<char, std::char_traits<char>, CharAllocator> ShmString;
