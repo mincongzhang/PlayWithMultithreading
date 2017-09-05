@@ -188,6 +188,7 @@ namespace shm_string_hashmap {
       return m_shm_hashmap_ptr->size();
     }
 
+    /*Free Memory (bytes)*/
     size_t get_free_memory() const {
       return m_segment.get_free_memory();
     }
