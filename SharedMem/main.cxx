@@ -212,82 +212,87 @@ int main (int argc, char *argv[])
 
   //Create
   if(which=="c"){
-    std::cout<<id<<":"<<"Creating"<<std::endl;
+    std::cout<<id<<" "+which+" "<<":"<<"Creating"<<std::endl;
 
-    //boost::interprocess::shared_memory_object::remove("MizhangSharedMemory");
+    boost::interprocess::shared_memory_object::remove("MizhangSharedMemory");
 
     ShmStringHashMap shm_hash("MizhangSharedMemory","ShmHashMap1",655350,3000);
+    std::cout<<id<<" "+which+" "<<":"<<"Free Memory: ["<<shm_hash.get_free_memory()<<"] bytes"<<std::endl;
+
     for(int i = 0; i < record_num; ++i) {
-      std::cout<<id<<":"<<"Creating: Shm Hash: "<<i<<" -> create"<<std::endl;
+      std::cout<<id<<" "+which+" "<<":"<<"Creating: Shm Hash: "<<i<<" -> create"<<std::endl;
       shm_hash.insert(to_string(i),"create");
     }
 
-    std::cout<<id<<":"<<"Creating done"<<std::endl;
+    std::cout<<id<<" "+which+" "<<":"<<"Free Memory: ["<<shm_hash.get_free_memory()<<"] bytes"<<std::endl;
+    std::cout<<id<<" "+which+" "<<":"<<"Creating done"<<std::endl;
   }
 
   //Update
   if(which=="u"){
-    std::cout<<id<<":"<<"Updating"<<std::endl;
+    std::cout<<id<<" "+which+" "<<":"<<"Updating"<<std::endl;
 
     ShmStringHashMap shm_hash("MizhangSharedMemory","ShmHashMap1",6553600,3000);
+    std::cout<<id<<" "+which+" "<<":"<<"Free Memory: ["<<shm_hash.get_free_memory()<<"] bytes"<<std::endl;
     for(int i = 0; i < record_num; ++i) {
       std::string val = to_string(id);
-      std::cout<<id<<":"<<"Updating: Shm Hash: "<<i<<" -> "<<val<<std::endl;
+      std::cout<<id<<" "+which+" "<<":"<<"Updating: Shm Hash: "<<i<<" -> "<<val<<std::endl;
       shm_hash.insert(to_string(i),val);
     }
 
-    std::cout<<id<<":"<<"Updating done"<<std::endl;
+    std::cout<<id<<" "+which+" "<<":"<<"Free Memory: ["<<shm_hash.get_free_memory()<<"] bytes"<<std::endl;
+    std::cout<<id<<" "+which+" "<<":"<<"Updating done"<<std::endl;
   }
 
   //Append
   if(which=="a"){
-    std::cout<<id<<":"<<"Appending"<<std::endl;
+    std::cout<<id<<" "+which+" "<<":"<<"Appending"<<std::endl;
 
     ShmStringHashMap shm_hash("MizhangSharedMemory","ShmHashMap1",6553600,3000);
+    std::cout<<id<<" "+which+" "<<":"<<"Free Memory: ["<<shm_hash.get_free_memory()<<"] bytes"<<std::endl;
     for(int i = 0; i < record_num; ++i) {
       std::string val = "+" + to_string(id);
-      std::cout<<id<<":"<<"Appending: Shm Hash: "<<i<<" -> "<<val<<std::endl;
+      std::cout<<id<<" "+which+" "<<":"<<"Appending: Shm Hash: "<<i<<" -> "<<val<<std::endl;
       shm_hash.append(to_string(i),val);
     }
 
-    std::cout<<id<<":"<<"Appending done"<<std::endl;
-    std::cout<<id<<":"<<"size:"<<shm_hash.size()<<std::endl;
-    std::cout<<id<<":"<<"free mem:"<<shm_hash.get_free_memory()<<std::endl;
+    std::cout<<id<<" "+which+" "<<":"<<"Appending done"<<std::endl;
+    std::cout<<id<<" "+which+" "<<":"<<"Free Memory: ["<<shm_hash.get_free_memory()<<"] bytes"<<std::endl;
   }
 
 
   //Read
   if(which=="r"){
-    std::cout<<id<<":"<<"Reading"<<std::endl;
+    std::cout<<id<<" "+which+" "<<":"<<"Reading"<<std::endl;
 
     ShmStringHashMap shm_hash("MizhangSharedMemory","ShmHashMap1");
     for(int i = 0; i < record_num; ++i) {
       //boost::this_thread::sleep( boost::posix_time::milliseconds(100) );
       std::string val;
       if(shm_hash.find(to_string(i),val)){
-        std::cout<<id<<":"<<"Reading Shm Hash: "<<i<<" -> "<<val<<std::endl;
+        std::cout<<id<<" "+which+" "<<":"<<"Reading Shm Hash: "<<i<<" -> "<<val<<std::endl;
       }
     }
 
-    std::cout<<id<<":"<<"Reading done"<<std::endl;
+    std::cout<<id<<" "+which+" "<<":"<<"Reading done"<<std::endl;
   }
 
   //Destroy
   if(which=="d"){
-    std::cout<<id<<":"<<"Destroying"<<std::endl;
+    std::cout<<id<<" "+which+" "<<":"<<"Destroying"<<std::endl;
 
     ShmStringHashMap shm_hash("MizhangSharedMemory","ShmHashMap1");
     shm_hash.destroy();
     for(int i = 0; i < record_num; ++i) {
       std::string val;
       if(shm_hash.find(to_string(i),val)){
-        std::cout<<id<<":"<<"Shm Hash after destroy: "<<i<<" -> "<<val<<std::endl;
+        std::cout<<id<<" "+which+" "<<":"<<"Shm Hash after destroy: "<<i<<" -> "<<val<<std::endl;
       } else {
-        std::cout<<id<<":"<<"Can't find anything for Shm Hash after destroy: "<<i<<" -> "<<val<<std::endl;
+        std::cout<<id<<" "+which+" "<<":"<<"Can't find anything for Shm Hash after destroy: "<<i<<" -> "<<val<<std::endl;
       }
     }
 
-    std::cout<<id<<":"<<"Destroying done"<<std::endl;
+    std::cout<<id<<" "+which+" "<<":"<<"Destroying done"<<std::endl;
   }
 
   return 0;
