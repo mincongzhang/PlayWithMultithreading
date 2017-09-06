@@ -178,6 +178,17 @@ namespace shm_string_hashmap {
       return true;
     }
 
+    /*Dump*/
+    void dump() const {
+      boost::interprocess::sharable_lock<upgradable_mutex_type> lock(m_mutex);
+
+      if(!checkValid()){ return; }
+      ShmHashMap::const_iterator iter = m_shm_hashmap_ptr->begin();
+      for(;iter!=m_shm_hashmap_ptr->end();++iter){
+        std::cout<<iter->first<<" "<<iter->second<<std::endl;
+      }
+    }
+
     /*Destroy*/
     bool destroy(){
       return m_segment.destroy<ShmHashMap>(m_hashmap_name.c_str());
@@ -185,6 +196,7 @@ namespace shm_string_hashmap {
 
     /*Size*/
     size_t size() const {
+      if(!checkValid()){ return 0; }
       return m_shm_hashmap_ptr->size();
     }
 
@@ -208,15 +220,19 @@ int main (int argc, char *argv[])
   const std::string which = argv[1];
   const std::string id = argv[2];
 
+  std::string shm_name = "MizhangSharedMemory";
+  std::string hashtable_name = "ShmHashMap1";
+  int shm_size = 655350;
+  int hash_size = 3000;
   int record_num = 100;
 
   //Create
   if(which=="c"){
     std::cout<<id<<" "+which+" "<<":"<<"Creating"<<std::endl;
 
-    boost::interprocess::shared_memory_object::remove("MizhangSharedMemory");
+    boost::interprocess::shared_memory_object::remove(shm_name.c_str());
 
-    ShmStringHashMap shm_hash("MizhangSharedMemory","ShmHashMap1",655350,3000);
+    ShmStringHashMap shm_hash(shm_name,hashtable_name,shm_size,hash_size);
     std::cout<<id<<" "+which+" "<<":"<<"Free Memory: ["<<shm_hash.get_free_memory()<<"] bytes"<<std::endl;
 
     for(int i = 0; i < record_num; ++i) {
@@ -232,7 +248,7 @@ int main (int argc, char *argv[])
   if(which=="u"){
     std::cout<<id<<" "+which+" "<<":"<<"Updating"<<std::endl;
 
-    ShmStringHashMap shm_hash("MizhangSharedMemory","ShmHashMap1",6553600,3000);
+    ShmStringHashMap shm_hash(shm_name,hashtable_name,shm_size,hash_size);
     std::cout<<id<<" "+which+" "<<":"<<"Free Memory: ["<<shm_hash.get_free_memory()<<"] bytes"<<std::endl;
     for(int i = 0; i < record_num; ++i) {
       std::string val = to_string(id);
@@ -248,7 +264,7 @@ int main (int argc, char *argv[])
   if(which=="a"){
     std::cout<<id<<" "+which+" "<<":"<<"Appending"<<std::endl;
 
-    ShmStringHashMap shm_hash("MizhangSharedMemory","ShmHashMap1",6553600,3000);
+    ShmStringHashMap shm_hash(shm_name,hashtable_name,shm_size,hash_size);
     std::cout<<id<<" "+which+" "<<":"<<"Free Memory: ["<<shm_hash.get_free_memory()<<"] bytes"<<std::endl;
     for(int i = 0; i < record_num; ++i) {
       std::string val = "+" + to_string(id);
@@ -260,12 +276,11 @@ int main (int argc, char *argv[])
     std::cout<<id<<" "+which+" "<<":"<<"Free Memory: ["<<shm_hash.get_free_memory()<<"] bytes"<<std::endl;
   }
 
-
   //Read
   if(which=="r"){
     std::cout<<id<<" "+which+" "<<":"<<"Reading"<<std::endl;
 
-    ShmStringHashMap shm_hash("MizhangSharedMemory","ShmHashMap1");
+    ShmStringHashMap shm_hash(shm_name,hashtable_name);
     for(int i = 0; i < record_num; ++i) {
       //boost::this_thread::sleep( boost::posix_time::milliseconds(100) );
       std::string val;
@@ -277,11 +292,20 @@ int main (int argc, char *argv[])
     std::cout<<id<<" "+which+" "<<":"<<"Reading done"<<std::endl;
   }
 
+  //Read
+  if(which=="v"){
+    std::cout<<id<<" "+which+" "<<":"<<"Dumping"<<std::endl;
+    ShmStringHashMap shm_hash(shm_name,hashtable_name);
+    shm_hash.dump();
+    std::cout<<id<<" "+which+" "<<":"<<"Dumping done"<<std::endl;
+  }
+
+
   //Destroy
   if(which=="d"){
     std::cout<<id<<" "+which+" "<<":"<<"Destroying"<<std::endl;
 
-    ShmStringHashMap shm_hash("MizhangSharedMemory","ShmHashMap1");
+    ShmStringHashMap shm_hash(shm_name,hashtable_name);
     shm_hash.destroy();
     for(int i = 0; i < record_num; ++i) {
       std::string val;
