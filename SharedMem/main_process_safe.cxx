@@ -77,6 +77,7 @@ namespace shm_string_hashmap {
     }
 
     void dump(){
+      boost::interprocess::sharable_lock<upgradable_mutex_type> lock(m_mutex);
       ShmHashMap::const_iterator iter = m_shm_hashmap.begin();
       for(;iter!=m_shm_hashmap.end();++iter){
         std::cout<<iter->first<<" "<<iter->second<<std::endl;
@@ -98,8 +99,6 @@ namespace shm_string_hashmap {
 
     mutable boost::interprocess::managed_shared_memory m_segment;
     ShmSafeHashMap * m_shm_hashmap_ptr;
-
-    bool m_readonly;
 
     bool checkValid() const {
       if(!m_shm_hashmap_ptr){
@@ -127,8 +126,8 @@ namespace shm_string_hashmap {
          boost::hash<KeyType>(),               // the hash function
          std::equal_to<KeyType>(),             // the equality function
          m_segment.get_allocator<ValueType>());  // the allocator
+
       checkValid();
-      m_readonly = false;
     }
 
     //2.open read only
@@ -143,7 +142,6 @@ namespace shm_string_hashmap {
       m_shm_hashmap_ptr = m_segment.find<ShmSafeHashMap>(m_hashmap_name.c_str()).first;
 
       checkValid();
-      m_readonly = true;
     }
 
     /*Insert*/
@@ -285,7 +283,7 @@ int main (int argc, char *argv[])
   if(which=="r"){
     std::cout<<id<<" "+which+" "<<":"<<"Reading"<<std::endl;
 
-    ShmStringHashMap shm_hash(shm_name,hashtable_name);
+    ShmStringHashMap shm_hash(shm_name,hashtable_name,shm_size,hash_size);
     for(int i = 0; i < record_num; ++i) {
       //boost::this_thread::sleep( boost::posix_time::milliseconds(100) );
       std::string val;
@@ -300,7 +298,7 @@ int main (int argc, char *argv[])
   //Read
   if(which=="v"){
     std::cout<<id<<" "+which+" "<<":"<<"Dumping"<<std::endl;
-    ShmStringHashMap shm_hash(shm_name,hashtable_name);
+    ShmStringHashMap shm_hash(shm_name,hashtable_name,shm_size,hash_size);
     shm_hash.dump();
     std::cout<<id<<" "+which+" "<<":"<<"Dumping done"<<std::endl;
   }
