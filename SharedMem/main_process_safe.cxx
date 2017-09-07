@@ -111,13 +111,14 @@ namespace shm_string_hashmap {
 
   public:
     /*Constructor*/
-    //1.open or create
+    //open or create
     ShmStringHashMap(const std::string & shm_name, const std::string & hashmap_name,
-                     const int & shm_bytes, const int & hashmap_size):
+                     const int & shm_bytes=655350, const int & hashmap_size=3000):
       m_shm_name(shm_name), m_shm_bytes(shm_bytes),
       m_hashmap_name(hashmap_name),m_hashmap_size(hashmap_size),
       m_segment(boost::interprocess::open_or_create, m_shm_name.c_str(), m_shm_bytes){
       //If anything fails, throws interprocess_exception
+      //cannot use open_read_only because mutex inside ShmSafeHashMap will be changed
 
       //can also use boost::interprocess::unique_instance if you only need one uniq object without naming it
       m_shm_hashmap_ptr = m_segment.find_or_construct<ShmSafeHashMap>(m_hashmap_name.c_str())
@@ -130,27 +131,8 @@ namespace shm_string_hashmap {
       checkValid();
     }
 
-    //2.open read only
-    ShmStringHashMap(const std::string & shm_name,const std::string & hashmap_name):
-      m_shm_name(shm_name), m_hashmap_name(hashmap_name),
-      m_segment(boost::interprocess::open_read_only, m_shm_name.c_str()){
-      //If anything fails, throws interprocess_exception
-
-      //!Tries to find a previously created object. Returns a pointer to the object and the
-      //!count (if it is not an array, returns 1). If not present, the returned pointer is 0
-      //std::pair<MyType *,std::size_t> ret = managed_memory_segment.find<MyType>("Name");
-      m_shm_hashmap_ptr = m_segment.find<ShmSafeHashMap>(m_hashmap_name.c_str()).first;
-
-      checkValid();
-    }
-
     /*Insert*/
     bool insert(const std::string & key, const std::string & val){
-      if(m_readonly){
-        std::cout<<"ERROR! readonly mode, not able to insert!"<<std::endl;
-        return false;
-      }
-
       //check
       if(!checkValid()){ return false; }
 
@@ -161,11 +143,6 @@ namespace shm_string_hashmap {
     }
 
     bool append(const std::string & key,std::string & val){
-      if(m_readonly){
-        std::cout<<"ERROR! readonly mode, not able to append!"<<std::endl;
-        return false;
-      }
-
       //check
       if(!checkValid()){ return false; }
 
