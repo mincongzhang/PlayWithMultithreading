@@ -13,3 +13,4 @@ virtual memory
 physical memory  
 RSS/PSS  
 https://www.selenic.com/smem/  
+https://stackoverflow.com/questions/7880784/what-is-rss-and-vsz-in-linux-memory-management/21049737#21049737  
