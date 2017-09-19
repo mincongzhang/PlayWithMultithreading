@@ -7,3 +7,9 @@ http://boost.2283326.n4.nabble.com/interprocess-mutex-in-shared-memory-crash-rec
 https://stackoverflow.com/questions/6267973/boostinterprocessscoped-lock-application-crash-inside-lock
 
 https://stackoverflow.com/questions/7808431/boost-interprocess-named-mutex-remains-acquired-after-a-crash
+
+TODO:
+virtual memory  
+physical memory  
+RSS/PSS  
+https://www.selenic.com/smem/  
