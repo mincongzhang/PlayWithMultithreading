@@ -12,5 +12,8 @@ TODO:
 virtual memory  
 physical memory  
 RSS/PSS  
+
+PSS: proportional set size (PSS) is the portion of main memory (RAM) occupied by a process and is composed by the private memory of that process plus the proportion of shared memory with one or more other processes. 
+
 https://www.selenic.com/smem/  
 https://stackoverflow.com/questions/7880784/what-is-rss-and-vsz-in-linux-memory-management/21049737#21049737  
